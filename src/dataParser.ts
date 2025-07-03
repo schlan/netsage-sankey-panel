@@ -166,7 +166,7 @@ export function parseData(data: { series: any[] }, options: { valueField: any },
     color: any;
     node0: any;
   }> = [];
-  let pluginDataNodes: Array<{ name: any; id: any; colId: number }> = [];
+  let pluginDataNodes: Array<{ name: any; id: any; }> = [];
   let col0: Array<{ name: any; index: number; color: any }> = [];
   let rowDisplayNames: Array<{ name: any; display: any }> = [];
 
@@ -179,9 +179,9 @@ export function parseData(data: { series: any[] }, options: { valueField: any },
     // go through columns to find all nodes
     for (let i = 0; i < numFields; i++) {
       let node = row[i];
-      let index = pluginDataNodes.findIndex((e) => e.name === node && e.colId === i);
+      let index = pluginDataNodes.findIndex((e) => e.name === node );  // && e.colId === i
       if (index === -1) {
-        index = pluginDataNodes.push({ name: node, id: [`row${rowId}`], colId: i }) - 1;
+        index = pluginDataNodes.push({ name: node, id: [`row${rowId}`] }) - 1;
         if (i === 0) {
           currentColor = colorArray[col0.length % colorArray.length];
           col0.push({ name: node, index: index, color: currentColor });
@@ -192,8 +192,8 @@ export function parseData(data: { series: any[] }, options: { valueField: any },
       currentLink.push(index);
     }
     // create all the individual links, value is always the last column
-    // let rowColor = colorArray[currentLink[0] % colorArray.length];
-    let rowColor = col0.find((e) => e.index === currentLink[0])?.color;
+    let rowColor = colorArray[currentLink[0] % colorArray.length];
+    // let rowColor = col0.find((e) => e.index === currentLink[0])?.color;
     let rowDisplay = `${pluginDataNodes[currentLink[0]].name}`;
     for (let i = 0; i < currentLink.length - 1; i++) {
       let fieldValues = valueField[0].display(row[numFields]);
@@ -220,5 +220,6 @@ export function parseData(data: { series: any[] }, options: { valueField: any },
   });
   const pluginData = { links: pluginDataLinks, nodes: pluginDataNodes };
 
-  return [pluginData, displayNames, rowDisplayNames, valueField[0], fixColor];
+  const result = [pluginData, displayNames, rowDisplayNames, valueField[0], fixColor];
+  return result;
 }
