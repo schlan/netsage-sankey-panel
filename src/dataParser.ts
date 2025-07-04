@@ -1,4 +1,4 @@
-import { DataFrameView, Field, getFieldDisplayName, Vector } from '@grafana/data';
+import { DataFrameView, getFieldDisplayName } from '@grafana/data';
 // import { color } from 'd3';
 /**
  * Takes data from Grafana query and returns it in the format needed for this panel
@@ -121,7 +121,7 @@ export function parseData(data: { series: any[] }, options: { valueField: any },
 
   // get display names
   let displayNames: string[] = [];
-  allData.forEach((field: Field<any, Vector<any>>) => {
+  allData.forEach((field: any) => {
     displayNames.push(getFieldDisplayName(field));
   });
 
@@ -179,12 +179,13 @@ export function parseData(data: { series: any[] }, options: { valueField: any },
     // go through columns to find all nodes
     for (let i = 0; i < numFields; i++) {
       let node = row[i];
-      let index = pluginDataNodes.findIndex((e) => e.name === node );  // && e.colId === i
+      let mappedNodeName = allData[i].display ? allData[i].display(node).text : String(node);
+      let index = pluginDataNodes.findIndex((e) => e.name === mappedNodeName );
       if (index === -1) {
-        index = pluginDataNodes.push({ name: node, id: [`row${rowId}`] }) - 1;
+        index = pluginDataNodes.push({ name: mappedNodeName, id: [`row${rowId}`] }) - 1;
         if (i === 0) {
           currentColor = colorArray[col0.length % colorArray.length];
-          col0.push({ name: node, index: index, color: currentColor });
+          col0.push({ name: mappedNodeName, index: index, color: currentColor });
         }
       } else {
         pluginDataNodes[index].id.push(`row${rowId}`); // might not need?
